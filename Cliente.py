@@ -10,8 +10,8 @@ id = str(input("Digite o ID: "))
 i=0
 
 while (i!=10):
-    temp = random.uniform(9,30)
-    timestamp = datetime.now().timestamp()
+    temp = random.uniform(10,40)
+    timestamp = datetime.now()
 
     id = str(id)
     temp = str(temp)
