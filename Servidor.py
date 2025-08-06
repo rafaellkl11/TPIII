@@ -1,7 +1,11 @@
 from socket import *
-import csv
 from threading import Thread
+from datetime import datetime
 import time
+import matplotlib.pyplot  as plt
+import numpy as np
+import matplotlib.dates as mdates
+
 serverPort = 12000
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
@@ -67,6 +71,51 @@ def resultados():
 			print ("id: ",ids[i],"|","media: ",media)
 			arquivo.close()
 			i = i + 1
+		
+		plt.ion()
+
+		fig, ax = plt.subplots(figsize = (12,6))
+		idsGrf = {}
+
+		arquivo = open ("dados.csv","r")
+		
+		for dado in arquivo:
+			id, temp, data = dado.strip().split(";")
+			id = int(id)
+			temp = int(temp)
+			timestamp = datetime.strptime(data, "%Y-%m-%d %H:%M")
+
+			if id not in idsGrf:
+				idsGrf[id] = {'tempos': [], 'valores': [], 'linha': None}
+			idsGrf[id]['tempos'].append(timestamp)
+			idsGrf[id]['valores'].append(temp)
+
+			# Atualizar o gráfico
+			ax.clear()
+
+			for g, dados_g in idsGrf.items():
+				ax.plot(dados_g['tempos'], dados_g['valores'], marker='o', label=f'id {g}')
+
+			# Configurações do gráfico
+			ax.set_title("Gráfico em Tempo Real por id")
+			ax.set_xlabel("Tempo")
+			ax.set_ylabel("Valor")
+			ax.legend()
+			ax.grid(True)
+
+			# Formatação de datas no eixo X
+			ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+			fig.autofmt_xdate()
+
+			plt.pause(0.2)  # Simula tempo de chegada de novos dados
+		arquivo.close()
+		print("teste1")
+
+		# Desligar modo interativo ao final
+		plt.ioff()
+		print("teste2")
+		plt.show()
+		print("teste3")
 
 servidor1 = Thread(target=servidor)
 resultados2 = Thread(target=resultados)

@@ -30,4 +30,4 @@ while (i!=10):
     print ('Resposta do servidor:', modifiedSentence.decode())
     clientSocket.close()
     i = i+1
-    time.sleep(5)
+    time.sleep(60)
