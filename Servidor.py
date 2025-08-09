@@ -29,8 +29,14 @@ def servidor():
 		temp = int(temp[0:2])
 
 		if(temp<15 or temp>35):
-			res="Temperatura fora do padrão!"
-			arquivo = open('dados.csv', 'a')
+			alerts = open ("alerts.csv","a")
+			if (temp < 15):
+				res ="Temperatura baixa!\nDados armazenados com sucesso!"
+				alerts.write(str(id)+";"+str(temp)+";Baixa"+";\n")
+			elif (temp > 35):
+				res ="Temperatura alta!\nDados armazenados com sucesso!"
+				alerts.write(str(id)+";"+str(temp)+";Alta"+";\n")
+			alerts.close()
 			connectionSocket.send(res.encode())
 		else:
 			res="Dados armazenados com sucesso!"
@@ -38,8 +44,7 @@ def servidor():
 		connectionSocket.close()
 
 def resultados():
-	while True:
-		time.sleep(10)
+	def media():
 		arquivo = open("dados.csv","r")
 		ids = []
 		for dado in arquivo:
@@ -52,11 +57,8 @@ def resultados():
 		arquivo.close()
 		
 		ids.sort()
-		print(ids)
-
-		i=0
-
 		
+		i=0		
 		while (i!=len(ids)):
 			j = 0
 			soma = 0
@@ -71,7 +73,17 @@ def resultados():
 			print ("id: ",ids[i],"|","media: ",media)
 			arquivo.close()
 			i = i + 1
-		
+		fim = str(input("Aperte Enter para voltar para o menu"))
+	
+	def alertas():
+		arquivo = open("alerts.csv","r")
+		for dado in arquivo:
+			dado = dado.split(";")
+			print("ID: "+dado[0]+" | Temperatura: "+dado[1]+" | Alerta: "+dado[2]+" ")
+		arquivo.close()
+		fim = str(input("Aperte Enter para voltar para o menu"))
+
+	def grafico():	
 		plt.ion()
 
 		fig, ax = plt.subplots(figsize = (12,6))
@@ -107,15 +119,32 @@ def resultados():
 			ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
 			fig.autofmt_xdate()
 
-			plt.pause(0.2)  # Simula tempo de chegada de novos dados
+			plt.pause(0.1)  # Simula tempo de chegada de novos dados
 		arquivo.close()
-		print("teste1")
 
 		# Desligar modo interativo ao final
 		plt.ioff()
-		print("teste2")
 		plt.show()
-		print("teste3")
+
+		fim = str(input("Aperte Enter para voltar para o menu"))
+
+	while True:
+		print("===Menu===")
+		print("1. Exibir média")
+		print("2. Exibir alertas")
+		print("3. Exibir grafico")
+		opcao = int(input("Digite o número da opção: "))
+
+		if(opcao == 1):
+			print ("\nMédia: ")
+			media()
+		elif(opcao ==2):
+			print("\nAlertas: ")
+			alertas()
+		elif (opcao == 3):
+			grafico()
+		else:
+			print("Erro digite novamente!\n")
 
 servidor1 = Thread(target=servidor)
 resultados2 = Thread(target=resultados)
